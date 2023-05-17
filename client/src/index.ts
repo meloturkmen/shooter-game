@@ -84,7 +84,7 @@ export const babylonInit = async (): Promise<void> => {
 
     const meshManager = new MeshManager(scene);
     const keyboardInputManager = new KeyboardInputManager(scene);
-    const serverConnection = new ServerConnection(io("http://localhost:8080"));
+    const serverConnection = new ServerConnection(io("https://3qsb0n-8080.csb.app"));
     const player = new Player(scene, meshManager, keyboardInputManager, serverConnection);
     const game = new Game(serverConnection, meshManager, player);
 
