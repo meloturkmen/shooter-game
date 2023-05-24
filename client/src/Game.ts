@@ -6,6 +6,11 @@ import { Player } from "./Player";
 import { Vector3 } from "@babylonjs/core";
 import Bullet from "./Bullet";
 
+
+interface ResultPlayer {
+    id: string;
+    time: number;
+}
 export class Game {
     private _gameState: GameState;
     private _networkPlayers: Map<string, NetworkPlayer> = new Map();
@@ -46,6 +51,66 @@ export class Game {
         bullet.shootBullet();
 
     }
+
+    public onGameOver(playerID: string, playerTime: number) {
+
+        this._player.gameOver();
+
+        this._viewResult({ id: playerID, time: playerTime });
+
+    }
+
+    private _viewResult(winner: ResultPlayer) {
+
+        const container = document.getElementById("result-container") as HTMLDivElement;
+
+
+        const winnerText = document.getElementById("winner") as HTMLDivElement;
+
+        winnerText.innerHTML = `Player-${winner.id} won! `;
+
+        const timeText = document.getElementById("player-time") as HTMLDivElement;
+
+        timeText.innerHTML = `${winner.time} seconds`;
+
+        container.style.display = "flex";
+
+        this._countdown();
+
+    }
+
+    private _countdown() {
+        let time = 10;
+        function handleTime() {
+            document.getElementById("restart-time").innerHTML = String(time--);
+
+            if (time == 0) {
+                clearInterval(interval);
+                this.restartGame();
+            }
+
+
+        }
+        const interval = setInterval(handleTime.bind(this), 1000);
+
+
+
+    }
+
+
+    public restartGame() {
+
+        const container = document.getElementById("result-container") as HTMLDivElement;
+
+        container.style.display = "none";
+
+        this._gameState = GAME_INITIAL_STATE;
+        this._networkPlayers.forEach((player) => player.restart());
+        this._player.restart();
+    }
+
+
+
 
 
     private handleUpdatedGameState(newState: GameState) {

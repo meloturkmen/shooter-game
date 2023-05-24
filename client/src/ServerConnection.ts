@@ -35,6 +35,15 @@ export class ServerConnection {
         this._socket.on(WebsocketEvents.Dead, () => callback());
     }
 
+    public emitGameOver( playerTime: number) {
+        this._socket.emit(WebsocketEvents.GameOver, playerTime);
+    }
+
+    public onGameOver(callback: (playerID: string, playerTime: number) => void) {
+        this._socket.on(WebsocketEvents.GameOver, (playerID: string, playerTime: number) => callback(playerID, playerTime));
+    }
+
+
 
 
 

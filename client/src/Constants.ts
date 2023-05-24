@@ -4,4 +4,5 @@ export enum WebsocketEvents {
     Shoot = "shoot",
     Hit = "hit",
     Dead = "dead",
+    GameOver = "gameOver"
 }

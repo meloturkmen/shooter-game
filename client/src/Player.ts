@@ -1,4 +1,4 @@
-import { Vector2, Vector3, Mesh, Scene, Quaternion, AbstractMesh, DeepImmutableObject, Vector4 } from "@babylonjs/core";
+import { Vector2, Vector3, Mesh, Scene, Color3, Quaternion, StandardMaterial, AbstractMesh, DeepImmutableObject, Vector4, RayHelper, UniversalCamera } from "@babylonjs/core";
 import { ClientState } from "./State";
 import { MeshManager } from "./MeshManager";
 import { KeyboardInputManager } from "./KeyboardInputManager";
@@ -6,6 +6,7 @@ import { PLAYER_INITIAL_STATE } from "./State";
 import PlayerInput from "./InputController";
 import Bullet from "./Bullet";
 import { ServerConnection } from "./ServerConnection";
+
 
 const MOVEMENT_SPEED = 0.3;
 
@@ -26,7 +27,11 @@ export class Player {
     private _state: ClientState = PLAYER_INITIAL_STATE;
     private _meshManager: MeshManager;
 
+    private _startDate: Date;
+    private _endDate: Date;
+
     private _velocity: Vector3 = new Vector3(0, 0, 0);
+    private _direction: Quaternion = new Quaternion(0, 0, 0, 0);
 
     private _moveDirection: Vector3 = new Vector3(0, 0, 0);
 
@@ -65,21 +70,41 @@ export class Player {
 
         // shoot bullet to clicked position 
 
-        this._scene.onPointerDown = (e, pickResult) => {
-            const direction = pickResult.ray.direction;
+
+        // window.addEventListener("click", () => {
+
+        //     const direction = this.directionVector;
+
+        //     const bullet = new Bullet("player-bullet", new Vector3(this.positionVector.x, 2, this.positionVector.z), direction, this._scene, this._serverConnection);
+
+        //     bullet.shootBullet();
+
+        //     this._serverConnection.emitShoot(this.positionVector.asArray(), direction.asArray());
+
+        // });
+        // window.addEventListener("keydown", (e) => {
+        //     // if pressed soace bar shoot bullet 
+
+        //     if (e.key === " ") {
+        //         const target = this._scene.getMeshByName("itarget");
+        //         const canon = this._scene.getMeshByName("canon");
 
 
 
-            const bullet = new Bullet("player-bullet", new Vector3(this.positionVector.x, 2, this.positionVector.z), direction, this._scene, this._serverConnection);
 
-            bullet.shootBullet();
-
-            this._serverConnection.emitShoot(this.positionVector.asArray(), direction.asArray());
-
-        }
+        //         const dir = target.getAbsolutePosition().subtract(canon.getAbsolutePosition());
 
 
 
+
+        //         const bullet = new Bullet("player-bullet", new Vector3(this.positionVector.x, 2, this.positionVector.z), dir, this._scene, this._serverConnection);
+
+        //         bullet.shootBullet();
+        //     }
+
+
+
+        // });
 
 
     }
@@ -101,6 +126,8 @@ export class Player {
 
         this._mesh = await this._meshManager.createPlayerMesh("player");
 
+
+
         setTimeout(async () => {
             const { root, animations } = await this._meshManager._createPlayer("player");
 
@@ -109,9 +136,81 @@ export class Player {
 
 
             root.setParent(this._mesh);
+            this._startDate = new Date();
+
+
+            this.detectCollisionWithTarget();
         }, 2000);
 
+        this.setupFirstPersonCamera();
+
     }
+
+
+    private detectCollisionWithTarget() {
+        const target = this._scene.getMeshByName("targetRegion") as Mesh;
+
+        console.log("target", target);
+
+
+        // check if player reach the target region 
+        this._mesh.physicsImpostor.registerOnPhysicsCollide(target.physicsImpostor, (main, collided) => {
+
+            console.log("collided", collided);
+
+            this._serverConnection.emitGameOver(this.playerTime)
+
+        });
+    }
+
+    public gameOver() {
+
+        console.log("game over");
+
+        // function handleRestart(e: KeyboardEvent) {
+
+        //     // if pressed soace bar shoot bullet 
+
+        //     // if pressed enter restart game
+        //     if (e.key === "Enter") {
+        //         this.restart();
+
+        //         const resultContainer = document.getElementById("result-container") as HTMLDivElement;
+
+        //         resultContainer.style.display = "none";
+
+        //         window.removeEventListener("keydown", handleRestart);
+        //     }
+
+
+
+        // }
+
+        // window.addEventListener("keydown", handleRestart.bind(this));
+
+    }
+
+
+    public restart() {
+
+        this._state = PLAYER_INITIAL_STATE;
+        this._mesh.position = new Vector3(0, 0, 0);
+
+        this._startDate = new Date();
+    }
+
+
+
+
+
+    private get playerTime(): number {
+
+        this._endDate = new Date();
+        const diff = this._endDate.getTime() - this._startDate.getTime();
+
+        return diff;
+    }
+
 
 
     public updateState(newState: ClientState) {
@@ -233,6 +332,8 @@ export class Player {
 
         const direction = Quaternion.FromEulerAngles(0, angle, 0);
 
+        this._direction = direction;
+
 
 
 
@@ -258,9 +359,43 @@ export class Player {
         });
     }
 
+
+    private createCanonTubeAndTarget() {
+
+        const itarget = Mesh.CreateBox("itarget", 0.1, this._scene);
+        itarget.position.y = 2;
+        itarget.position.z = 5;
+        itarget.parent = this._playerMesh;
+        itarget.isVisible = false;
+
+        const canon = Mesh.CreateCylinder("canon", 1, 0.2, 0.2, 6, 1, this._scene);
+        canon.position.y = 2
+        canon.rotation.set(Math.PI / 2, 0, 0);
+        canon.parent = this._playerMesh;
+        canon.isVisible = false;
+
+
+
+    }
+
     public dead() {
         this._mesh.dispose();
         this._playerMesh.dispose();
     }
+
+    private setupFirstPersonCamera() {
+        const camera = new UniversalCamera("UniversalCamera", new Vector3(0, 0, 0), this._scene);
+
+        camera.fov = 0.5;
+        camera.minZ = 0.1;
+        camera.maxZ = 1000;
+        camera.speed = 0.1;
+
+        camera.attachControl(this._scene.getEngine().getRenderingCanvas()!, true);
+
+        this._scene.activeCamera = camera;
+
+    }
+
 
 }

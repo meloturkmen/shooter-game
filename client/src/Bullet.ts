@@ -121,7 +121,8 @@ class Bullet {
 
         const material = new StandardMaterial("material", this._scene);
 
-        material.diffuseColor = new Color3(1, 1, 0.5);
+        material.diffuseColor = new Color3(1, 0.5, 0);
+
 
         bullet.material = material;
 

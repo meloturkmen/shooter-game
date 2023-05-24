@@ -1,7 +1,7 @@
-import { AbstractMesh, Mesh, Quaternion } from "@babylonjs/core";
+import { AbstractMesh, Mesh, Quaternion, Vector3 } from "@babylonjs/core";
 import { MeshManager } from "./MeshManager";
 import { ClientState, PLAYER_INITIAL_STATE } from "./State";
-import { Vector3 } from "babylonjs";
+
 
 export class NetworkPlayer {
     private _mesh: Mesh;
@@ -38,6 +38,11 @@ export class NetworkPlayer {
         }, 2000);
 
 
+    }
+
+    public restart() {
+        this._state = PLAYER_INITIAL_STATE;
+        this._mesh.position = new Vector3(0, 0, 0);
     }
 
 
@@ -85,7 +90,7 @@ export class NetworkPlayer {
     }
 
     public disconnect() {
-        this._mesh.dispose();
-        this._playerMesh.dispose();
+        this._mesh?.dispose();
+        this._playerMesh?.dispose();
     }
 }

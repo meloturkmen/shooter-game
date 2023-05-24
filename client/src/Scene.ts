@@ -1,6 +1,6 @@
 import { GroundBuilder } from '@babylonjs/core/Meshes/Builders/groundBuilder';
 import { CreateGround } from '@babylonjs/core/Meshes/Builders/groundBuilder';
-import { Scene, Engine, WebGPUEngine, ArcRotateCamera, StandardMaterial, Texture, Vector3, HemisphericLight, UniversalCamera, Color3, MeshBuilder, SceneLoader, PhysicsBody, PhysicsMotionType, CubeTexture, ShadowGenerator, PointLight, FreeCamera } from "@babylonjs/core";
+import { Scene, Engine, WebGPUEngine, ArcRotateCamera, StandardMaterial, Texture, Vector3, HemisphericLight, UniversalCamera, Color3, MeshBuilder, SceneLoader, PhysicsBody, PhysicsMotionType, CubeTexture, ShadowGenerator, PointLight, FreeCamera, Tools, FollowCamera, ShaderMaterial, GlowLayer, Mesh } from "@babylonjs/core";
 
 import { AmmoJSPlugin } from "@babylonjs/core/Physics/Plugins/ammoJSPlugin";
 
@@ -24,6 +24,14 @@ interface IScene {
     init: () => void;
 
 }
+
+const RANDOM_TARGET_POINT = [
+    { x: 140, z: 160 },
+    { x: 140, z: -40 },
+    { x: 20, z: -160 },
+    { x: -100, z: 20 },
+    { x: -40, z: 160 },
+]
 
 class CustomScene implements IScene {
 
@@ -84,6 +92,7 @@ class CustomScene implements IScene {
         this.createLights(scene)
         this.createSky(scene)
         this.createCamera(scene)
+        this.createTargetRegion(scene);
 
 
         return scene;
@@ -92,13 +101,12 @@ class CustomScene implements IScene {
     createCamera(scene: Scene) {
         const canvas = document.getElementById("renderCanvas") as HTMLCanvasElement;
 
-        const camera = new FreeCamera("UniversalCamera", new Vector3(0, 3, -20), scene);
+
+
+        const camera = new FollowCamera("UniversalCamera", new Vector3(0, 3, -20), scene);
         camera.setTarget(Vector3.Zero());
 
-        camera.applyGravity = true;
-        camera.ellipsoid = new Vector3(1, 1.5, 1);
-        camera.checkCollisions = true;
-        camera.attachControl(canvas, true);
+
 
 
         scene.activeCamera = camera;
@@ -173,11 +181,13 @@ class CustomScene implements IScene {
 
                 root.physicsImpostor = new PhysicsImpostor(root, PhysicsImpostor.BoxImpostor, { mass: 0, restitution: 0.9 }, scene);
                 // dont let the player and bullet collide with the map  
-                root.physicsImpostor.physicsBody.collisionFilterGroup = 2;
-                root.physicsImpostor.physicsBody.collisionFilterMask = 2;
 
-                root.physicsImpostor.physicsBody.setCollisionFlags(2);
-                root.physicsImpostor.physicsBody.setActivationState(4);
+
+                // create ellipsoid for collisions with player and bullets 
+
+                root.ellipsoid = new Vector3(0.5, 0.9, 0.5);
+                root.ellipsoidOffset = new Vector3(0, root.ellipsoid.y, 0);
+
 
 
             });
@@ -187,6 +197,66 @@ class CustomScene implements IScene {
 
 
     }
+
+    private createTargetRegion(scene: Scene) {
+
+
+        const region = MeshBuilder.CreateDisc("targetRegion", { radius: 8 }, scene);
+
+        region.rotation.x = Math.PI / 2;
+
+        region.position = new Vector3(0, 0, 0);
+        region.physicsImpostor = new PhysicsImpostor(region, PhysicsImpostor.SphereImpostor, { mass: 0, restitution: 0.9 }, scene);
+
+        region.ellipsoid = new Vector3(0.5, 0.9, 0.5);
+        region.ellipsoidOffset = new Vector3(0, region.ellipsoid.y, 0);
+
+        region.checkCollisions = true;
+
+        const material = new StandardMaterial("material", scene);
+
+
+        material.emissiveColor = Color3.Teal();
+        material.diffuseColor = Color3.Teal();
+
+        region.material = material;
+
+
+        const region2 = MeshBuilder.CreateDisc("targetRegion-main", { radius: 4 }, scene);
+        region2.rotation.x = Math.PI / 2;
+        region2.position = new Vector3(0, 0, 0);
+
+        const material2 = new StandardMaterial("material", scene);
+        material2.emissiveColor = Color3.Red();
+        material2.diffuseColor = Color3.Red();
+
+        region2.material = material2;
+
+
+        const gl = new GlowLayer("glow", scene, {
+            mainTextureSamples: 4
+        });
+
+
+        const point = RANDOM_TARGET_POINT[Math.floor(Math.random() * RANDOM_TARGET_POINT.length)];
+
+        console.log({ point })
+
+
+        const position1 = new Vector3(point.x, 0, point.z);
+        const position2 = new Vector3(point.x, 0, point.z);
+
+        region2.position = position1;
+        region.position = position2;
+
+
+        region.position.y = 0.25;
+        region2.position.y = 0.35;
+
+
+
+    }
+
 
     async createEngine(): Promise<Engine | WebGPUEngine> {
 
@@ -252,6 +322,7 @@ class CustomScene implements IScene {
         }
 
     }
+
 
 
     private resize() {

@@ -29,49 +29,6 @@ declare global {
     }
 }
 
-// (async () => {
-//     const scene = new Scene();
-
-//     await scene.init();
-
-//     const meshManager = new MeshManager(scene.scene);
-//     const keyboardInputManager = new KeyboardInputManager(scene.scene);
-//     const serverConnection = new ServerConnection(io("http://localhost:8080"));
-//     const player = new Player(scene.scene, meshManager, keyboardInputManager);
-//     const game = new Game(serverConnection, meshManager, player);
-
-//     const update = () => {
-//         // Update game
-
-//     };
-
-//     setInterval(() => game.sendClientState());
-
-//     scene.scene.onBeforeRenderObservable.add(() => update());
-//     // const socket = new Socket();
-//     // const player = new Player(scene.scene);
-
-// })();
-
-
-
-// function addNewPlayer(scene: IScene, socket: Socket) {
-//     console.log("adding new player");
-// }
-
-
-// function onShotted({
-//     playerName,
-//     position,
-//     direction,
-//     scene,
-// }: SocketData & { scene: IScene }) {
-
-//     const bullet = new Bullet(playerName, new Vector3(position._x, position._y, position._z), new Vector3(direction._x, direction._y, direction._z), scene);
-//     bullet.shootBullet();
-
-// }
-
 
 
 
@@ -84,7 +41,7 @@ export const babylonInit = async (): Promise<void> => {
 
     const meshManager = new MeshManager(scene);
     const keyboardInputManager = new KeyboardInputManager(scene);
-    const serverConnection = new ServerConnection(io("https://3qsb0n-8080.csb.app"));
+    const serverConnection = new ServerConnection(io("http://localhost:8080"));
     const player = new Player(scene, meshManager, keyboardInputManager, serverConnection);
     const game = new Game(serverConnection, meshManager, player);
 
@@ -103,6 +60,12 @@ export const babylonInit = async (): Promise<void> => {
         alert("you are dead");
         player.dead();
     })
+
+
+    serverConnection.onGameOver((playerID: string, playerTime: number) => {
+        game.onGameOver(playerID, playerTime);
+    })
+
 
 
     const update = () => {
