@@ -61,7 +61,7 @@ export class Player {
 
         this._init();
         this.updateState(initialState);
-        this._addListeners();
+     
     }
 
     private get positionVector(): Vector3 {
@@ -143,9 +143,6 @@ export class Player {
 
             this.detectCollisionWithTarget();
         }, 2000);
-
-        this.setupFirstPersonCamera();
-
     }
 
 
@@ -198,7 +195,7 @@ export class Player {
 
     public restart() {
 
-
+        this._state = PLAYER_INITIAL_STATE;
         this._mesh.position = new Vector3(0, 0, 0);
 
         this._startDate = new Date();
@@ -391,19 +388,7 @@ export class Player {
         this._playerMesh.dispose();
     }
 
-    private setupFirstPersonCamera() {
-        const camera = new UniversalCamera("UniversalCamera", new Vector3(0, 0, 0), this._scene);
-
-        camera.fov = 0.5;
-        camera.minZ = 0.1;
-        camera.maxZ = 1000;
-        camera.speed = 0.1;
-
-        camera.attachControl(this._scene.getEngine().getRenderingCanvas()!, true);
-
-        this._scene.activeCamera = camera;
-
-    }
+  
 
 
 }

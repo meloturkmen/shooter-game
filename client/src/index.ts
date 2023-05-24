@@ -8,6 +8,8 @@ import { ServerConnection } from './ServerConnection';
 import * as io from "socket.io-client"
 import { Vector3 } from "@babylonjs/core";
 
+export const SERVER_URL = "https://3qsb0n-8080.csb.app";
+export const LOCAL_SERVER_URL = "http://localhost:8080";
 declare global {
     interface Document {
         mozCancelFullScreen?: () => Promise<void>;
@@ -41,7 +43,7 @@ export const babylonInit = async (): Promise<void> => {
 
     const meshManager = new MeshManager(scene);
     const keyboardInputManager = new KeyboardInputManager(scene);
-    const serverConnection = new ServerConnection(io("https://3qsb0n-8080.csb.app"));
+    const serverConnection = new ServerConnection(io(SERVER_URL));
     const player = new Player(scene, meshManager, keyboardInputManager, serverConnection);
     const game = new Game(serverConnection, meshManager, player);
 

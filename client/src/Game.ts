@@ -53,7 +53,7 @@ export class Game {
     }
 
     public onGameOver(playerID: string, playerTime: number) {
-        
+
         this._viewResult({ id: playerID, time: playerTime });
 
     }
@@ -75,7 +75,7 @@ export class Game {
         const seconds = winner.time - minutes * 60;
 
 
-        timeText.innerHTML = `${minutes} minutes,${seconds} seconds`;
+        timeText.innerHTML = `${seconds} seconds`;
 
         container.style.display = "flex";
 
@@ -160,16 +160,10 @@ export class Game {
         oldPlayersState: { id: string; state: ClientState }[]
     ) {
         const newPlayersIDs: string[] = newPlayersState.map(({ id }) => id);
-
-        // dispoe of disconnected players 
-
-
-
         oldPlayersState.forEach(({ id }) => {
             if (!newPlayersIDs.includes(id)) {
                 const networkPlayer = this._networkPlayers.get(id);
                 networkPlayer?.disconnect();
-
                 this._networkPlayers.delete(id);
             }
         });

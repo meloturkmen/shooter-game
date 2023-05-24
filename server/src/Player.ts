@@ -60,18 +60,7 @@ export class Player {
         return !this.isDead;
     }
 
-    public reset() {
 
-        this._health = this._maxHealth;
-        this._state = {
-            health: this._health,
-            isMoving: false,
-            position: [0, 0, 0],
-            direction: [0, 0, 0, 0]
-        };
-
-
-    }
 
 
 
