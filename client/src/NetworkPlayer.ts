@@ -41,7 +41,6 @@ export class NetworkPlayer {
     }
 
     public restart() {
-        this._state = PLAYER_INITIAL_STATE;
         this._mesh.position = new Vector3(0, 0, 0);
     }
 

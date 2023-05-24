@@ -193,7 +193,7 @@ export class Player {
 
     public restart() {
 
-        this._state = PLAYER_INITIAL_STATE;
+      
         this._mesh.position = new Vector3(0, 0, 0);
 
         this._startDate = new Date();
