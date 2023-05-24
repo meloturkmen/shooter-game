@@ -103,8 +103,7 @@ export class Game {
         const container = document.getElementById("result-container") as HTMLDivElement;
 
         container.style.display = "none";
-
-        this._gameState = GAME_INITIAL_STATE;
+     
         this._networkPlayers.forEach((player) => player.restart());
         this._player.restart();
     }
