@@ -42,6 +42,9 @@ export class ClientSocket {
 
 
 
+
+
+
     private decodeGameState(state: GameState): DecodedGameState {
         return {
             players: state.players.map((player: Player) => {

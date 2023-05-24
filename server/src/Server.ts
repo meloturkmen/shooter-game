@@ -6,6 +6,7 @@ import { Logger } from "./Logger";
 import { ClientSocket } from "./ClientSocket";
 import { Player } from "./Player";
 import { Game } from "./Game";
+import { WebsocketEvents } from "./Constants";
 
 const TICKRATE = 30;
 const TICK_INTERVAL = 1000 / TICKRATE;
@@ -48,28 +49,17 @@ export class Server {
             this._game.addPlayer(player);
 
 
-            socket.on("hit", (playerID: string) => {
-                this._game.hitPlayer(playerID);
-                const isDead = this._game.isPLayerDead(playerID);
-
-                if (isDead) {
-                    this._game.removePlayer(playerID);
-                    socket.to(playerID).emit("dead");
-                }
-
-            });
-
-            socket.on("gameOver", (playerTime: number) => {
+            socket.on(WebsocketEvents.GameOver, (playerTime: number) => {
 
 
                 console.log("game over", playerTime);
 
-                const playerID = socket.id.toString();
 
-                socket.emit("gameOver", "You ", playerTime)
-                socket.broadcast.emit("gameOver", `Player-${playerID}`, playerTime);
 
-         
+                socket.emit(WebsocketEvents.GameOver, "You ", playerTime)
+                socket.broadcast.emit(WebsocketEvents.GameOver, `Player-${player.id}`, playerTime);
+
+
 
             });
 

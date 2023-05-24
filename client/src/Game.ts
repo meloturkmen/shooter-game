@@ -53,9 +53,7 @@ export class Game {
     }
 
     public onGameOver(playerID: string, playerTime: number) {
-
-        this._player.gameOver();
-
+        
         this._viewResult({ id: playerID, time: playerTime });
 
     }
