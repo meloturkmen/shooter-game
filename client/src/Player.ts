@@ -202,8 +202,9 @@ export class Player {
         this._mesh.position = new Vector3(0, 0, 0);
 
         this._startDate = new Date();
-
         this._isGameEnd = false;
+
+
     }
 
 

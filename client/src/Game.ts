@@ -71,7 +71,13 @@ export class Game {
 
         const timeText = document.getElementById("player-time") as HTMLDivElement;
 
-        timeText.innerHTML = `${winner.time} seconds`;
+        // convert time diffrence to minutes and seconds
+
+        const minutes = Math.floor(winner.time / 60);
+        const seconds = winner.time - minutes * 60;
+
+
+        timeText.innerHTML = `${minutes} minutes,${seconds} seconds`;
 
         container.style.display = "flex";
 
@@ -103,7 +109,7 @@ export class Game {
         const container = document.getElementById("result-container") as HTMLDivElement;
 
         container.style.display = "none";
-     
+
         this._networkPlayers.forEach((player) => player.restart());
         this._player.restart();
     }
@@ -165,7 +171,7 @@ export class Game {
             if (!newPlayersIDs.includes(id)) {
                 const networkPlayer = this._networkPlayers.get(id);
                 networkPlayer?.disconnect();
-                
+
                 this._networkPlayers.delete(id);
             }
         });
