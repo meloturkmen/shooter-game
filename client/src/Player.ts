@@ -61,7 +61,7 @@ export class Player {
 
         this._init();
         this.updateState(initialState);
-     
+
     }
 
     private get positionVector(): Vector3 {
@@ -195,7 +195,12 @@ export class Player {
 
     public restart() {
 
-        this._state = PLAYER_INITIAL_STATE;
+        this._state = {
+            position: [0, 0, 0],
+            direction: this._state.direction,
+            isMoving: false,
+            health: 100,
+        }
         this._mesh.position = new Vector3(0, 0, 0);
 
         this._startDate = new Date();
@@ -388,7 +393,7 @@ export class Player {
         this._playerMesh.dispose();
     }
 
-  
+
 
 
 }

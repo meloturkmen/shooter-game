@@ -54,6 +54,7 @@ export class NetworkPlayer {
 
     public updateState(newState: ClientState) {
 
+     
         if (!this._mesh) return;
         this._state = newState;
         const [x, y, z] = newState.position;

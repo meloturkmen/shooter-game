@@ -57,6 +57,7 @@ export class MeshManager {
 
         playerBox.rotationQuaternion = new Quaternion(0, 1, 0, 0); // rotate the player mesh 180 since we want to see the back of the player
 
+
         playerBox.physicsImpostor = new PhysicsImpostor(playerBox, PhysicsImpostor.BoxImpostor, { mass: 0, restitution: 0.9 }, this._scene)
 
         playerBox.checkCollisions = true;
@@ -65,7 +66,7 @@ export class MeshManager {
         playerBox.ellipsoid = new Vector3(0.5, 0.9, 0.5);
         playerBox.ellipsoidOffset = new Vector3(0, playerBox.ellipsoid.y, 0);
 
-     
+
         return Promise.resolve(playerBox);
     }
 
@@ -81,9 +82,6 @@ export class MeshManager {
         });
 
         const root = result.meshes[0];
-
-
-
 
         root.isVisible = false;
 
