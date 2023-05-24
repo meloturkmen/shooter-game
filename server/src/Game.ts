@@ -55,4 +55,11 @@ export class Game {
         );
         this._logger.userLog(id, "left game");
     }
+
+    public restartGame() {
+        this._gameState.players.forEach((player: Player) => {
+            player.reset();
+        });
+    }
+
 }

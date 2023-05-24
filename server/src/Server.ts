@@ -59,6 +59,27 @@ export class Server {
 
             });
 
+            socket.on("gameOver", (playerTime: number) => {
+
+
+                console.log("game over", playerTime);
+
+                const playerID = socket.id.toString();
+
+                socket.emit("gameOver", "You ", playerTime)
+                socket.broadcast.emit("gameOver", `Player-${playerID}`, playerTime);
+
+                setTimeout(() => {
+                    console.log("restart game");
+                    this._game.restartGame();
+                }, 10000);
+
+            });
+
+
+
+
+
 
             socket.on("disconnect", () => {
                 this._game.removePlayer(player.id);
