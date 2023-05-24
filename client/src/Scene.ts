@@ -1,6 +1,6 @@
 import { GroundBuilder } from '@babylonjs/core/Meshes/Builders/groundBuilder';
 import { CreateGround } from '@babylonjs/core/Meshes/Builders/groundBuilder';
-import { Scene, Engine, WebGPUEngine, ArcRotateCamera, StandardMaterial, Texture, Vector3, HemisphericLight, UniversalCamera, Color3, MeshBuilder, SceneLoader, PhysicsBody, PhysicsMotionType, CubeTexture, ShadowGenerator, PointLight, FreeCamera, Tools, FollowCamera, ShaderMaterial, GlowLayer, Mesh } from "@babylonjs/core";
+import { Scene, Engine, WebGPUEngine, ArcRotateCamera, StandardMaterial, Texture, Vector3, HemisphericLight, UniversalCamera, Color3, MeshBuilder, SceneLoader, PhysicsBody, PhysicsMotionType, CubeTexture, ShadowGenerator, PointLight, Animation, FreeCamera, Tools, FollowCamera, ShaderMaterial, GlowLayer, Mesh, ArcFollowCamera, Viewport } from "@babylonjs/core";
 
 import { AmmoJSPlugin } from "@babylonjs/core/Physics/Plugins/ammoJSPlugin";
 
@@ -92,6 +92,7 @@ class CustomScene implements IScene {
         this.createLights(scene)
         this.createSky(scene)
         this.createCamera(scene)
+        this.createStartPoint(scene)
         this.createTargetRegion(scene);
 
 
@@ -99,15 +100,41 @@ class CustomScene implements IScene {
     }
 
     createCamera(scene: Scene) {
+
+
         const canvas = document.getElementById("renderCanvas") as HTMLCanvasElement;
 
 
+        const camera = new ArcRotateCamera("Camera-1", 0,
+            0,
+            3, new Vector3(0, 10, -20), scene);
 
-        const camera = new FollowCamera("UniversalCamera", new Vector3(0, 3, -20), scene);
-        camera.setTarget(Vector3.Zero());
 
 
+        camera.setTarget(Vector3.Zero())
 
+        const camera2 = new ArcRotateCamera("Camera-2", -Math.PI / 2, 0.001, 500, Vector3.Zero(), scene);
+
+        camera2.position.x = 0;
+        camera2.position.y = 0;
+
+
+        scene.activeCameras = [];
+
+        scene.activeCameras.push(camera);
+        scene.activeCameras.push(camera2);
+
+        camera.attachControl(canvas, true);
+
+        camera.viewport = new Viewport(0.0, 0, 1.0, 1.0);
+        camera2.viewport = new Viewport(0.8, 0.8, 0.2, 0.2);
+
+        camera2.layerMask = 2;
+        camera.layerMask = 1;
+
+
+        scene.activeCameras.push(camera);
+        scene.activeCameras.push(camera2);
 
         scene.activeCamera = camera;
 
@@ -198,6 +225,83 @@ class CustomScene implements IScene {
 
     }
 
+    private createStartPoint(scene: Scene) {
+
+        const modelUrl = "https://holonext.blob.core.windows.net/holonext-public-container/holonext-game/map_pointer.glb";
+
+
+        SceneLoader.ImportMesh("", "https://holonext.blob.core.windows.net/holonext-public-container/holonext-game/", `map_pointer.glb`, this.scene, function (meshes) {
+
+            const root = meshes[0];
+            root.name = "startPoint";
+            root.position = new Vector3(0, 5, 0)
+            root.scaling = new Vector3(0.5, 0.5, 0.5)
+
+
+            const startGround = MeshBuilder.CreateDisc("startGround", { radius: 4 }, scene);
+
+
+            startGround.rotation.x = Math.PI / 2;
+            startGround.position = new Vector3(0, 0.15, 0);
+
+
+            const meterial = new StandardMaterial("material", scene);
+
+            meterial.emissiveColor = Color3.Teal();
+            meterial.diffuseColor = Color3.Green();
+
+            startGround.material = meterial;
+
+
+            // animate the start point in y axis with keyframes 
+
+
+            const animation = new Animation("myAnimation", "position.y", 30, Animation.ANIMATIONTYPE_FLOAT, Animation.ANIMATIONLOOPMODE_CYCLE);
+
+            const keys = []
+
+
+            keys.push({
+                frame: 0,
+                value: 5
+            })
+
+            keys.push({
+                frame: 25,
+                value: 5.5
+            })
+
+            keys.push({
+                frame: 50,
+                value: 6
+            })
+
+            keys.push({
+                frame: 75,
+                value: 5.5
+
+            })
+
+            keys.push({
+                frame: 100,
+                value: 5
+            })
+
+            animation.setKeys(keys);
+
+            root.animations = [];
+
+            root.animations.push(animation);
+
+
+            scene.beginAnimation(root, 0, 100, true);
+
+
+
+        });
+
+    }
+
     private createTargetRegion(scene: Scene) {
 
 
@@ -238,7 +342,7 @@ class CustomScene implements IScene {
         });
 
 
-        const point = RANDOM_TARGET_POINT[Math.floor(Math.random() * RANDOM_TARGET_POINT.length)];
+        const point = RANDOM_TARGET_POINT[0];
 
         console.log({ point })
 
@@ -334,6 +438,8 @@ class CustomScene implements IScene {
     private render() {
         this.engine.runRenderLoop(() => {
             this.scene.render();
+
+
         });
     }
 
