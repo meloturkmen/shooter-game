@@ -57,9 +57,7 @@ export class Game {
     }
 
     public restartGame() {
-        this._gameState.players.forEach((player: Player) => {
-            player.reset();
-        });
+        console.log("restarting game");
     }
 
 }

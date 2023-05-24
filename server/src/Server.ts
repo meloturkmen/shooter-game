@@ -69,10 +69,7 @@ export class Server {
                 socket.emit("gameOver", "You ", playerTime)
                 socket.broadcast.emit("gameOver", `Player-${playerID}`, playerTime);
 
-                setTimeout(() => {
-                    console.log("restart game");
-                    this._game.restartGame();
-                }, 10000);
+         
 
             });
 

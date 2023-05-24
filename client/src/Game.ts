@@ -157,10 +157,16 @@ export class Game {
         oldPlayersState: { id: string; state: ClientState }[]
     ) {
         const newPlayersIDs: string[] = newPlayersState.map(({ id }) => id);
+
+        // dispoe of disconnected players 
+
+
+
         oldPlayersState.forEach(({ id }) => {
             if (!newPlayersIDs.includes(id)) {
                 const networkPlayer = this._networkPlayers.get(id);
                 networkPlayer?.disconnect();
+                
                 this._networkPlayers.delete(id);
             }
         });
