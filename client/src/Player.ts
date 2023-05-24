@@ -27,6 +27,8 @@ export class Player {
     private _state: ClientState = PLAYER_INITIAL_STATE;
     private _meshManager: MeshManager;
 
+    private _isGameEnd: boolean = false;
+
     private _startDate: Date;
     private _endDate: Date;
 
@@ -158,6 +160,9 @@ export class Player {
 
             console.log("collided", collided);
 
+            if (this._isGameEnd) return;
+
+            this._isGameEnd = true;
             this._serverConnection.emitGameOver(this.playerTime)
 
         });
@@ -193,10 +198,12 @@ export class Player {
 
     public restart() {
 
-      
+
         this._mesh.position = new Vector3(0, 0, 0);
 
         this._startDate = new Date();
+
+        this._isGameEnd = false;
     }
 
 
