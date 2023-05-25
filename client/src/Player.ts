@@ -6,6 +6,7 @@ import { PLAYER_INITIAL_STATE } from "./State";
 import PlayerInput from "./InputController";
 import Bullet from "./Bullet";
 import { ServerConnection } from "./ServerConnection";
+import { AdvancedDynamicTexture, Rectangle, Control, TextBlock } from "@babylonjs/gui";
 
 
 const MOVEMENT_SPEED = 0.3;
@@ -26,7 +27,7 @@ export class Player {
     private _playerMesh: AbstractMesh;
     private _state: ClientState = PLAYER_INITIAL_STATE;
     private _meshManager: MeshManager;
-
+    private _advancedTexture: AdvancedDynamicTexture;
     private _isGameEnd: boolean = false;
 
     private _startDate: Date;
@@ -41,7 +42,7 @@ export class Player {
 
     private _input: PlayerInput;
 
-    private static readonly PLAYER_SPEED: number = 0.15;
+    private static readonly PLAYER_SPEED: number = 0.25;
     private _inputAmt: number;
 
     //Camera
@@ -53,8 +54,6 @@ export class Player {
     private _h: number;
     private _v: number;
 
-    private static readonly DOWN_TILT: Vector3 = new Vector3(0.8290313946973066, 0, 0);
-    private static readonly ORIGINAL_TILT: Vector3 = new Vector3(0.5934119456780721, 0, 0);
 
     constructor(
         scene: Scene,
@@ -107,7 +106,59 @@ export class Player {
 
 
             this.detectCollisionWithTarget();
+            this.createPLayerNameBox();
         }, 2000);
+    }
+
+    private createPLayerNameBox() {
+
+        if (!this._advancedTexture) {
+            this._advancedTexture = AdvancedDynamicTexture.CreateFullscreenUI("UI");
+        }
+
+        const playerNameBox = MeshBuilder.CreatePlane("player-name-box", {
+            width: 1,
+            height: 1
+        }, this._scene);
+
+        const playerNameBoxMaterial = new StandardMaterial("player-name-box-material", this._scene);
+
+        playerNameBoxMaterial.diffuseColor = Color3.Black();
+        playerNameBoxMaterial.emissiveColor = Color3.Black();
+
+        playerNameBox.material = playerNameBoxMaterial;
+
+        playerNameBox.position.set(0, 0, 0);
+
+        playerNameBox.setParent(this._mesh);
+
+        playerNameBox.isVisible = false;
+
+
+        this.addLabelToMesh(playerNameBox);
+
+
+    }
+
+    private addLabelToMesh(mesh: AbstractMesh): void {
+
+        const label: Rectangle = new Rectangle("Me");
+        label.background = "black";
+        label.height = "30px";
+        label.alpha = 0.5;
+        label.width = "100px";
+        label.cornerRadius = 20;
+        label.thickness = 1;
+        label.linkOffsetY = 30;
+        label.top = "10%";
+        label.zIndex = 5;
+        label.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+        this._advancedTexture.addControl(label);
+
+        const text1: TextBlock = new TextBlock();
+        text1.text = "Me";
+        text1.color = "white";
+        label.addControl(text1);
     }
 
 

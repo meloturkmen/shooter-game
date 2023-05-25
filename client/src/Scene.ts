@@ -92,7 +92,6 @@ class CustomScene implements IScene {
         this.createLights(scene)
         this.createSky(scene)
         this.createCamera(scene)
-        this.createStartPoint(scene)
         this.createTargetRegion(scene);
 
 

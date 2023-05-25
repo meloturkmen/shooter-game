@@ -11,6 +11,7 @@
         "@babylonjs/loaders": "^6.0.0",
         "@babylonjs/materials": "^6.0.0",
         "ammo.js": "github:kripken/ammo.js",
+        "@babylonjs/gui": "^6.5.0",
         "recast-detour": "^1.6.1",
         "socket.io-client": "^2.3.0",
         "uid": "^2.0.2"
