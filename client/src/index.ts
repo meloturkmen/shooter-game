@@ -8,7 +8,7 @@ import { ServerConnection } from './ServerConnection';
 import * as io from "socket.io-client"
 import { Vector3 } from "@babylonjs/core";
 
-export const SERVER_URL = "https://3qsb0n-8080.csb.app";
+export const SERVER_URL = "https://0f5cbg-8080.csb.app";
 export const LOCAL_SERVER_URL = "http://localhost:8080";
 declare global {
     interface Document {
@@ -43,7 +43,7 @@ export const babylonInit = async (): Promise<void> => {
 
     const meshManager = new MeshManager(scene);
     const keyboardInputManager = new KeyboardInputManager(scene);
-    const serverConnection = new ServerConnection(io(SERVER_URL));
+    const serverConnection = new ServerConnection(io(LOCAL_SERVER_URL));
     const player = new Player(scene, meshManager, keyboardInputManager, serverConnection);
     const game = new Game(serverConnection, meshManager, player);
 
